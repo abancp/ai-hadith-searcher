@@ -27,30 +27,31 @@ function App() {
       <input type="text" value={query} onChange={(e)=>{setQuery(e.target.value)}} placeholder="Search Hadiths" />
       <button type="submit">Submit</button>
     </form>
-    <div  hidden={results.length == 0} className={"results-container "+loading || results.length > 0 ? "h-full" : "h-0"}>
+    <div  hidden={results.length == 0} className="results-container">
     {loading ? (
         <div className="loader"></div>
       ) : (
-      results.map((hadith, i) => (
-          <div key={i} className={"result "}>
+      results.map((hadith, i) => {
+          if (hadith.status === "sahih"){
+        return (
+          <div key={i} className="result">
             <h3>{hadith.book?.bookName +" : "+hadith.hadithNumber}</h3>
             <p>{hadith.hadithArabic}</p>
             <p><em>{hadith.hadithEnglish}</em></p>
-            <div className="">
-              <p>chapter : {hadith.chapter?.chapterEnglish + "        " + hadith.chapter?.chapterArabic}</p>
+            <div className="flex between">
+              <p>chapter : {hadith.chapter?.chapterEnglish} </p>
+              <p> { hadith.chapter?.chapterArabic}</p>
+            </div>
+            <div className="flex between">
+              <p>{hadith.book?.writerName} </p>
             </div>
           </div>
-        ))
+      ) 
+}
+
+        })
       )}
     </div>
-    <footer>
-      <div>
-        <p>Intelligence : <span> Gemini 2.0 Flash </span> </p>
-        <p>Hadiths :  <span> Hadiths API </span> </p>
-      </div>
-      <p>(c) hadith finder 2025</p>
-      <p>github:abancp/hadiths</p>
-    </footer>
   </div>
 );
 

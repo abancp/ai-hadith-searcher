@@ -114,6 +114,14 @@ form button:hover {
   height: 0;
 }
 
+.flex{
+  display: flex;
+}
+
+.between{
+  justify-content: space-between;
+}
+
 footer{
   width: 100%;
   height: 2rem;
