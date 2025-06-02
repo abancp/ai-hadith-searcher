@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const HADITH_API_KEY = process.env.HADITH_API_KEY;
 
-app.use(cors({origin:['http://localhost:5173']}));
+app.use(cors({origin:['http://localhost:5173','https://hadith-finder.vercel.app']}));
 app.use(express.json());
 
 const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });

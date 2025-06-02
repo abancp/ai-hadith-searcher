@@ -2,6 +2,8 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import axios from 'axios'
+import SERVER_URL from '../config/SERVER_URL.js'
+
 import './App.css'
 
 function App() {
@@ -13,7 +15,7 @@ function App() {
     setResults([])
     setLoading(true)
     e.preventDefault()
-    const {data} = await axios.get('http://localhost:3000/search?query='+query)
+    const {data} = await axios.get(SERVER_URL+'/search?query='+query)
     console.log(data)
     setLoading(false)
     setResults(data.hadiths) 
@@ -26,7 +28,7 @@ function App() {
       <button type="submit">Submit</button>
     </form>
     <div  hidden={results.length == 0} className={"results-container "+loading || results.length > 0 ? "h-full" : "h-0"}>
-{loading ? (
+    {loading ? (
         <div className="loader"></div>
       ) : (
       results.map((hadith, i) => (
@@ -40,7 +42,6 @@ function App() {
           </div>
         ))
       )}
-
     </div>
     <footer>
       <div>
