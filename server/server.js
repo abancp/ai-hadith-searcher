@@ -33,7 +33,7 @@ app.get('/search', async (req, res) => {
       return res.status(400).json({ error: 'Query parameter is required' });
     }
     console.log(query)
-    const response = await ai.models.generateContentStream({
+    const response = await ai.models.generateContent({
       model: MODEL,
       contents: systemPropmpt + query,
     });
@@ -49,7 +49,7 @@ app.get('/search', async (req, res) => {
     }
     console.log(hadithIndexes)
 
-    const books = ['sahih-bukhari','sahih-muslim','abu-dawood','al-tirmidhi','ibn-e-majah','sunan-nasai']
+    const books = ['sahih-bukhari','sahih-muslim','abu-dawood','al-tirmidhi','sunan-nasai','ibn-e-majah']
     const hadiths = await Promise.all(
     hadithIndexes.map(async (hadith,i) => {
       const apiUrl = 'https://hadithapi.com/api/hadiths/?apiKey='+HADITH_API_KEY+'&book='+books[hadith[0]]+'&hadithNumber='+hadith.split('-')[1];

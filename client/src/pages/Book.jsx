@@ -3,7 +3,8 @@ import axios from 'axios'
 import SERVER_URL from '../../config/SERVER_URL.js'
 import "./Book.css"
 import { useParams } from "react-router";
-
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 
 function Book(){
@@ -13,12 +14,14 @@ function Book(){
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
   useEffect(()=>{
+    setLoading(true)
     axios.get(SERVER_URL+"/book/"+bookName).then(({data})=>{
+      setLoading(false)
       console.log(data)
       setChapters(data.chapters)
     })
     .catch(()=>{
-
+      setLoading(false)
     })
   },[]) 
     
@@ -27,14 +30,13 @@ function Book(){
     setLoading(true)
     e.preventDefault()
     try{
-      const {data} = await axios.get(SERVER_URL+'/search?query='+query)
+      const {data} = await axios.get(SERVER_URL+'/search?query='+query+" Search only in "+bookName)
     console.log(data)
     setLoading(false)
     setResults(data.hadiths) 
     }catch(e){
       setLoading(false)
     }
-
   }
 
   return (
@@ -48,7 +50,33 @@ function Book(){
         </button>
       </form>
       <div className="chapter-container">
-  
+<div  hidden={results.length == 0} className="results-container">
+    {loading ? (
+        <div className="loader"></div>
+      ) : (
+      results.map((hadith, i) => {
+          if (hadith.status.toLowerCase() === "sahih"){
+        return (
+          <div key={i} className="result ">
+            <h3>{hadith.book?.bookName +" : "+hadith.hadithNumber}</h3>
+            <p>{hadith.hadithArabic}</p>
+            <p><em>{hadith.hadithEnglish}</em></p>
+            <div className="flex between">
+              <p>chapter : {hadith.chapter?.chapterEnglish} </p>
+              <p> { hadith.chapter?.chapterArabic}</p>
+            </div>
+            <div className="flex between">
+              <p>{hadith.book?.writerName} </p>
+            </div>
+          </div>
+      ) 
+      }
+
+        })
+      )}
+    </div>
+
+      {chapters.length == 0 && <Skeleton height={68} containerClassName="gap-1" borderRadius={"8px"} className="mt-1"  count={10}/>} 
       {
         chapters.map((chapter)=>(
           <div className="chapter">
