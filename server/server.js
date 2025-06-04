@@ -11,6 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const HADITH_API_KEY = process.env.HADITH_API_KEY;
+const MODEL = process.env.MODEL;
 
 app.use(cors({origin:['http://localhost:5173','https://hadith-finder.vercel.app']}));
 app.use(express.json());
@@ -32,10 +33,11 @@ app.get('/search', async (req, res) => {
       return res.status(400).json({ error: 'Query parameter is required' });
     }
     console.log(query)
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+    const response = await ai.models.generateContentStream({
+      model: MODEL,
       contents: systemPropmpt + query,
     });
+    console.log(response.text)
 
 
     const match = response.text.match(/\[([^\]]+)\]/);
@@ -50,7 +52,7 @@ app.get('/search', async (req, res) => {
     const books = ['sahih-bukhari','sahih-muslim','abu-dawood','al-tirmidhi','ibn-e-majah','sunan-nasai']
     const hadiths = await Promise.all(
     hadithIndexes.map(async (hadith,i) => {
-      const apiUrl = 'https://hadithapi.com/api/hadiths/?apiKey=$2y$10$NTBVr5vXqufBslPs55IPZV6E9sOCe9MMHlbYgzXZEdtANF2AG&book='+books[hadith[0]]+'&hadithNumber='+hadith.split('-')[1];
+      const apiUrl = 'https://hadithapi.com/api/hadiths/?apiKey='+HADITH_API_KEY+'&book='+books[hadith[0]]+'&hadithNumber='+hadith.split('-')[1];
       const {data} = await axios.get(apiUrl)
       return data.hadiths?.data[0]
     })
@@ -63,6 +65,19 @@ app.get('/search', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+app.get('/book/:bookName',async (req,res)=>{
+  try {
+    const {bookName} = req.params
+    console.log('/book/'+bookName)
+    const {data} = await axios.get("https://hadithapi.com/api/"+bookName+"/chapters?apiKey="+HADITH_API_KEY) 
+    res.json({...data})
+    console.log(data)
+  } catch (error) {
+    res.status(500).json({"error":"internal server error "})
+    console.log(error)
+  }
+})
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
